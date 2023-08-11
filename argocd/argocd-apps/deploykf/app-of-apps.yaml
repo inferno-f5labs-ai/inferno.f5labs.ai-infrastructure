@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "main"
-    path: "argocd/apps/deploykf/argocd"
+    path: "argocd/argocd-apps/deploykf/argocd"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: "argocd"
