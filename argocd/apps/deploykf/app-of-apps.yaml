@@ -10,7 +10,7 @@ spec:
   project: "deploykf"
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
-    targetRevision: "master"
+    targetRevision: "main"
     path: "argocd/apps/deploykf/argocd"
   destination:
     server: "https://kubernetes.default.svc"
