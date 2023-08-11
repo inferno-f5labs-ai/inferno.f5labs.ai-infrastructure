@@ -4,9 +4,9 @@ metadata:
   name: deploykf
 spec:
   destination:
-    namespace: deploykf
+    namespace: argocd
     server: https://kubernetes.default.svc
-  project: deploykf
+  project: default
   source:
     path: "argocd/argocd-apps/deploykf"
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
