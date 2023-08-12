@@ -4,8 +4,8 @@
 deployKF_helpers:
   deploykf_profiles:
     users_id_mapping: {"user-1":{"email":"user1@f5labs.ai","id":"user-1"},"user-2":{"email":"user2@f5labs.ai","id":"user-2"}}
-    profiles_users_access_mapping: {"inferno":{"user-1":{"notebooksAccess":true,"role":"edit"},"user-2":{"notebooksAccess":true,"role":"edit"}},"inferno-admin":{"user-1":{"notebooksAccess":false,"role":"view"},"user-2":{"notebooksAccess":false,"role":"view"}}}
-    users_profiles_access_mapping: {"user-1":{"inferno":{"notebooksAccess":true,"role":"edit"},"inferno-admin":{"notebooksAccess":false,"role":"view"}},"user-2":{"inferno":{"notebooksAccess":true,"role":"edit"},"inferno-admin":{"notebooksAccess":false,"role":"view"}}}
+    profiles_users_access_mapping: {"admin":{"user-1":{"notebooksAccess":true,"role":"edit"},"user-2":{"notebooksAccess":true,"role":"edit"}},"guest":{"user-1":{"notebooksAccess":false,"role":"view"},"user-2":{"notebooksAccess":false,"role":"view"}}}
+    users_profiles_access_mapping: {"user-1":{"admin":{"notebooksAccess":true,"role":"edit"},"guest":{"notebooksAccess":false,"role":"view"}},"user-2":{"admin":{"notebooksAccess":true,"role":"edit"},"guest":{"notebooksAccess":false,"role":"view"}}}
 
   kubeflow:
     pipelines:
@@ -65,7 +65,7 @@ profileDefaults:
 
   ## the default email to set as the owner of profiles
   ##
-  ownerEmail: "inferno@f5.com"
+  ownerEmail: "s.singh@f5.com"
 
   ## the default access for members of profiles, when not explicitly specified
   ##
@@ -79,7 +79,7 @@ profileDefaults:
 
     ## if the user can ~connect~ to kubeflow notebooks in the profile
     ##
-    notebooksAccess: true
+    notebooksAccess: false
 
   ## the default list of plugins for profiles, when not explicitly specified
   ##
@@ -120,4 +120,4 @@ groups: [{"id":"inferno","users":["user-1","user-2"]}]
 ## profile definitions
 ##  - a list of profile definitions to be generated
 ##
-profiles: [{"members":[{"access":{"notebooksAccess":true,"role":"edit"},"group":"inferno"}],"name":"inferno"},{"members":[{"access":{"notebooksAccess":false,"role":"view"},"group":"inferno"}],"name":"inferno-admin"}]
+profiles: [{"members":[{"access":{"notebooksAccess":true,"role":"edit"},"group":"inferno"}],"name":"admin"},{"members":[{"access":{"notebooksAccess":false,"role":"view"},"group":"inferno"}],"name":"guest"}]

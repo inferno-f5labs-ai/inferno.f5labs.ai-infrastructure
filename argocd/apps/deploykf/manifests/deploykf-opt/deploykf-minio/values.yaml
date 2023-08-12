@@ -24,8 +24,8 @@ deployKF:
       selfSigned:
         injectedConfigMapName: "deploykf-gateway-issuer-root-ca-cert"
 
-  istio:
-    namespace: "istio-system"
+  auth:
+    namespace: "deploykf-auth"
 
   gateway:
     namespace: "deploykf-istio-gateway"
@@ -52,128 +52,120 @@ generate:
 
 
 ########################################
-## COMPONENT | dex
+## COMPONENT | minio
 ########################################
-dex:
-  ## configs for the dex container image
+minio:
+  ## configs for the minio container image
   ##
   image:
-    repository: "ghcr.io/dexidp/dex"
-    tag: "v2.37.0"
+    repository: "docker.io/minio/minio"
+    tag: "RELEASE.2023-08-04T17-40-21Z"
     pullPolicy: "IfNotPresent"
     pullSecret: ""
-    uid: 1001
-    gid: 1001
+    uid: 1000
+    gid: 1000
 
-  ## resource requests/limits for the dex Pods
+  ## configs for the mc container image
+  ##
+  mcImage:
+    repository: "docker.io/minio/mc"
+    tag: "RELEASE.2023-08-01T23-30-57Z"
+    pullPolicy: "IfNotPresent"
+    pullSecret: ""
+    uid: 1000
+    gid: 1000
+
+  ## configs for the kubectl container image
+  ##
+  kubectlImage:
+    repository: "docker.io/bitnami/kubectl"
+    tag: "1.26.6-debian-11-r8"
+    pullPolicy: "IfNotPresent"
+    pullSecret: ""
+    uid: 1000
+    gid: 1000
+
+  ## the securityContext configs for minio Pods
+  ## - spec for PodSecurityContext:
+  ##   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#podsecuritycontext-v1-core
+  ##
+  podSecurityContext:
+    ## sets filesystem owner group of in mounted volumes, ensuring pod has permissions to read data
+    fsGroup: 1000
+
+  ## resource requests/limits for the minio Pods
   ## - spec for ResourceRequirements:
   ##   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#resourcerequirements-v1-core
   ##
   resources: {}
 
-  ## log level for the dex container
+  ## persistence configs for minio
   ##
-  logLevel: "info"
+  persistence:
+    enabled: true
 
-  ## configs for token/key expiration
-  ##
-  expiry:
-    deviceRequests: "5m"
-    idTokens: "60m"
-    signingKeys: "6h"
-    refreshTokens:
-      reuseInterval: "30s"
-      validIfNotUsedFor: "168h"
-      absoluteLifetime: "2160h"
-
-  ## OpenID client configs for dex
-  ##
-  clients:
-
-    ## OpenID client for oauth2-proxy
-    ## - [WARNING] these configs must align with `oauth2Proxy.oidc.*`
+    ## the name of an existing PersistentVolumeClaim to use
+    ## - if non-emtpy, you must manually create a PVC with this name
     ##
-    oauth2Proxy:
-      clientId: "oauth2-proxy"
-      clientSecret:
-        value: "bbbbbbbbbbbbbbbb"
-        existingSecret: "generated--dex-oauth2-proxy-client"
-        existingSecretKey: "client_secret"
-        generateSecret: true
+    existingClaim: ""
 
-    ## OpenID client for Minio Console
+    ## the sub-path within the PersistentVolume to mount, instead of the root
     ##
-    minioConsole:
-      enabled: true
-      namespace: "deploykf-minio"
+    subPath: ""
+
+    ## the name of the StorageClass requested by the PersistentVolumeClaim
+    ## - if set to "", then `PersistentVolumeClaim/spec.storageClassName` is omitted
+    ## - if set to "-", then `PersistentVolumeClaim/spec.storageClassName` is set to ""
+    ##
+    storageClass: ""
+
+    ## the access mode of the PersistentVolumeClaim
+    ##
+    accessMode: "ReadWriteOnce"
+
+    ## the initial size for the PersistentVolumeClaim to request
+    ## - if your StorageClass has `allowVolumeExpansion=true`, kubernetes allows the
+    ##   PVC to grow in size as needed, starting from this value
+    ##
+    size: "5Gi"
+
+  ## root user configs for minio
+  ##
+  rootUser:
+    username: "minioadmin"
+    password: "minioadmin"
+    existingSecret: "generated--deploykf-minio-root-user"
+    existingSecretUsernameKey: "username"
+    existingSecretPasswordKey: "password"
+    generateSecret: true
+
+    ## service accounts for the root user
+    ##  - these service accounts are created and/or updated by a post-install job
+    ##
+    serviceAccounts: [{"existingSecret":"generated--kubeflow-pipelines--backend-object-store-auth","existingSecretAccessKeyKey":"access_key","existingSecretSecretKeyKey":"secret_key","generateSecret":true,"policy":{"Statement":[{"Action":["s3:GetBucketLocation","s3:ListBucket"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines"]},{"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/*","arn:aws:s3:::kubeflow-pipelines/pipelines/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/*"]}],"Version":"2012-10-17"}},{"existingSecret":"generated--kubeflow-pipelines--profile-object-store-auth--admin","existingSecretAccessKeyKey":"accesskey","existingSecretSecretKeyKey":"secretkey","generateSecret":true,"policy":{"Statement":[{"Action":["s3:GetBucketLocation","s3:ListBucket"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines"]},{"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/admin/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/admin/*"]}],"Version":"2012-10-17"}},{"existingSecret":"generated--kubeflow-pipelines--profile-object-store-auth--guest","existingSecretAccessKeyKey":"accesskey","existingSecretSecretKeyKey":"secretkey","generateSecret":true,"policy":{"Statement":[{"Action":["s3:GetBucketLocation","s3:ListBucket"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines"]},{"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/guest/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/guest/*"]}],"Version":"2012-10-17"}}]
+
+  ## identity configs for minio
+  ##
+  identity:
+
+    ## OpenID configs for minio
+    ##
+    openid:
+      displayName: "deployKF Auth"
+      policyClaim: "email"
+      scopes: "openid,email,groups,profile,offline_access"
       clientId: "minio-console"
       clientSecret:
         value: "bbbbbbbbbbbbbbbb"
-        existingSecret: "generated--dex-minio-console-client"
+        existingSecret: "cloned--minio-openid-secret"
         existingSecretKey: "client_secret"
-        generateSecret: true
 
-    ## OpenID client for Argo Server
-    ##
-    argoServer:
-      enabled: true
-      namespace: "kubeflow-argo-workflows"
-      clientId: "argo-server"
-      clientSecret:
-        value: "bbbbbbbbbbbbbbbb"
-        existingSecret: "generated--dex-argo-server-client"
-        existingSecretKey: "client_secret"
-        generateSecret: true
-
-  ## dex static passwords
+  ## minio buckets
+  ##  - these buckets are created and/or updated by a post-install job
   ##
-  staticPasswords: [{"email":"admin@f5labs.ai","password":{"value":"admin"}},{"email":"user1@f5labs.ai","password":{"value":"user1"}},{"email":"user2@f5labs.ai","password":{"value":"user2"}}]
+  buckets: [{"name":"kubeflow-pipelines","versioning":false}]
 
-  ## dex connectors
+  ## minio access policies
+  ##  - these policies are created and/or updated by a post-install job
   ##
-  connectors: []
-
-
-########################################
-## COMPONENT | oauth2-proxy
-########################################
-oauth2Proxy:
-  ## configs for the oauth2-proxy container image
-  ##
-  image:
-    repository: "quay.io/oauth2-proxy/oauth2-proxy"
-    tag: "v7.4.0"
-    pullPolicy: "IfNotPresent"
-    pullSecret: ""
-    uid: 65532
-    gid: 65532
-
-  ## resource requests/limits for the oauth2-proxy Pods
-  ## - spec for ResourceRequirements:
-  ##   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#resourcerequirements-v1-core
-  ##
-  resources: {}
-
-  ## OpenID configs for oauth2-proxy
-  ##
-  oidc:
-    clientId: "oauth2-proxy"
-    clientSecret:
-      value: "bbbbbbbbbbbbbbbb"
-      existingSecret: "generated--dex-oauth2-proxy-client"
-      existingSecretKey: "client_secret"
-
-  ## cookie configs for oauth2-proxy
-  ##
-  cookie:
-    name: "_deploykf_token"
-    expire: "168h"
-    refresh: "60m"
-    csrf:
-      expire: "15m"
-      perRequest: true
-    secret:
-      value: "cccccccccccccccc"
-      existingSecret: "generated--oauth2-proxy-cookie-secret"
-      existingSecretKey: "cookie_secret"
-      generateSecret: true
+  policies: [{"name":"user1@f5labs.ai","policy":{"Statement":[{"Action":["s3:GetBucketLocation","s3:ListBucket"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines"]},{"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/admin/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/admin/*"]},{"Action":["s3:GetObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/guest/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/guest/*"]}],"Version":"2012-10-17"}},{"name":"user2@f5labs.ai","policy":{"Statement":[{"Action":["s3:GetBucketLocation","s3:ListBucket"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines"]},{"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/admin/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/admin/*"]},{"Action":["s3:GetObject"],"Effect":"Allow","Resource":["arn:aws:s3:::kubeflow-pipelines/artifacts/guest/*","arn:aws:s3:::kubeflow-pipelines/v2/artifacts/guest/*"]}],"Version":"2012-10-17"}}]

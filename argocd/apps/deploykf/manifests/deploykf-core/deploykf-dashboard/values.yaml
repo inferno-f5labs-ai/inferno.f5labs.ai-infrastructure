@@ -58,10 +58,6 @@ centralDashboard:
         icon: assessment
         link: "/tensorboards/"
       - type: item
-        text: Katib
-        icon: kubeflow:katib
-        link: "/katib/"
-      - type: item
         text: KFP - Pipelines
         icon: kubeflow:pipeline-centered
         link: "/pipeline/#/pipelines"
@@ -94,6 +90,11 @@ centralDashboard:
         text: Argo Server
         icon: settings-input-composite
         link: "https://argo-server.kf.f5labs.ai:8443"
+      - type: item
+        iframe: false
+        text: Minio Console
+        icon: cloud
+        link: "https://minio-console.kf.f5labs.ai:8443"
 
     ## quick action links that appear in the home page
     ##
@@ -120,9 +121,6 @@ centralDashboard:
       - text: Kubeflow Training Operator Documentation
         desc: Documentation for Kubeflow Training Operator
         link: https://www.kubeflow.org/docs/components/training/
-      - text: Katib Documentation
-        desc: Documentation for Katib
-        link: https://www.kubeflow.org/docs/components/katib/
 
 
 ########################################

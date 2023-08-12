@@ -204,7 +204,7 @@ deploykf_core:
       ##  - [WARNING] changing the `ownerEmail` of profiles requires ~manual~ steps
       ##              https://github.com/kubeflow/kubeflow/issues/6576
       ##
-      ownerEmail: "inferno@f5.com"
+      ownerEmail: "s.singh@f5.com"
       ## the default access for members of profiles, when not explicitly specified
       ##  - `role`: the Kubernetes RBAC role to bind to the user in the profile namespace
       ##      - "edit": binds "ClusterRole/kubeflow-edit" (can view/create/delete resources)
@@ -214,7 +214,7 @@ deploykf_core:
       ##
       memberAccess:
         role: view
-        notebooksAccess: true
+        notebooksAccess: false
       ## the default list of plugins for profiles, when not explicitly specified
       ##  - each entry is a map with the following keys:
       ##     - `kind`: the kind of plugin
@@ -311,13 +311,13 @@ deploykf_core:
     ##                 - `existingSecretSecretKeyKey`: the key within the secret that contains the secret-key (default: "secret_key")
     ##
     profiles:
-      - name: inferno
+      - name: admin
         members:
           - group: inferno
             access:
               role: edit
               notebooksAccess: true
-      - name: inferno-admin
+      - name: guest
         members:
           - group: inferno
             access:
@@ -333,7 +333,7 @@ deploykf_opt:
   ##            deploykf-minio
   ## --------------------------------------
   deploykf_minio:
-    enabled: false
+    enabled: true
     namespace: deploykf-minio
     ## root user configs for minio
     ##
@@ -426,7 +426,7 @@ kubeflow_tools:
   ##                 katib
   ## --------------------------------------
   katib:
-    enabled: true
+    enabled: false
     ## mysql connection configs
     ##  - if `useExternal` is true, katib will use the specified external mysql database
     ##  - if `useExternal` is false, katib will use the embedded `deploykf_opt.deploykf_mysql` database,
