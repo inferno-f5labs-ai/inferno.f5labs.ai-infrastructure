@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kf-tools--poddefaults-webhook
+  name: kf-tools--pipelines
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: poddefaults-webhook
+    app.kubernetes.io/name: pipelines
     app.kubernetes.io/component: kubeflow-tools
     app.kubernetes.io/part-of: "deploykf"
   finalizers:
@@ -14,10 +14,14 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/kubeflow-tools/poddefaults-webhook"
+    path: "argocd/apps/deploykf/manifests/kubeflow-tools/pipelines"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kubeflow
+  syncPolicy:
+    syncOptions:
+      ## ensure argo-cd does not remove the fields added by kyverno
+      - RespectIgnoreDifferences=true
   ignoreDifferences:
     ## `caBundle` is injected by cert-manager
     - group: admissionregistration.k8s.io
@@ -29,3 +33,8 @@ spec:
       kind: ClusterRole
       jqPathExpressions:
         - "select(.aggregationRule.clusterRoleSelectors | length > 0) | .rules"
+    ## we use kyverno to trigger restarts by setting the "deploykf.org/restart-trigger" annotation when secrets change
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations/deploykf.org~1restart-trigger

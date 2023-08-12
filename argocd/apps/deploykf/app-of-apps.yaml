@@ -1,20 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kf-tools--tensorboards--tensorboards-web-app
+  name: "deploykf-app-of-apps"
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: tensorboards-web-app
-    app.kubernetes.io/component: kubeflow-tools
+    app.kubernetes.io/name: deploykf-app-of-apps
     app.kubernetes.io/part-of: "deploykf"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: "default"
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/kubeflow-tools/tensorboards/tensorboards-web-app"
+    path: "argocd/apps/deploykf/argocd"
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: kubeflow
+    namespace: "argocd"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - Validate=false
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true

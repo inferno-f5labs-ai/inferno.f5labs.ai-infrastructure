@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dkf-dep--cert-manager
+  name: kf-tools--notebooks--jupyter-web-app
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/component: deploykf-dependencies
+    app.kubernetes.io/name: jupyter-web-app
+    app.kubernetes.io/component: kubeflow-tools
     app.kubernetes.io/part-of: "deploykf"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,11 +14,7 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/deploykf-dependencies/cert-manager"
-    helm:
-      ignoreMissingValueFiles: true
-      valueFiles:
-        - values-overrides.yaml
+    path: "argocd/apps/deploykf/manifests/kubeflow-tools/notebooks/jupyter-web-app"
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: "cert-manager"
+    namespace: kubeflow

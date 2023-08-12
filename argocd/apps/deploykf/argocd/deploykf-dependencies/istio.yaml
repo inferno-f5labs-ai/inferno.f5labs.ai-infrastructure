@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/deploykf-dependencies/istio"
+    path: "argocd/apps/deploykf/manifests/deploykf-dependencies/istio"
     helm:
       ignoreMissingValueFiles: true
       valueFiles:

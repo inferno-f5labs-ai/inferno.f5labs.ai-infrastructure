@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kf-tools--volumes--volumes-web-app
+  name: dkf-core--deploykf-dashboard
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: volumes-web-app
-    app.kubernetes.io/component: kubeflow-tools
+    app.kubernetes.io/name: deploykf-dashboard
+    app.kubernetes.io/component: deploykf-core
     app.kubernetes.io/part-of: "deploykf"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,7 +14,11 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/kubeflow-tools/volumes/volumes-web-app"
+    path: "argocd/apps/deploykf/manifests/deploykf-core/deploykf-dashboard"
+    helm:
+      ignoreMissingValueFiles: true
+      valueFiles:
+        - values-overrides.yaml
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: kubeflow
+    namespace: "deploykf-dashboard"

@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kf-tools--tensorboards--tensorboard-controller
+  name: dkf-dep--cert-manager
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: tensorboard-controller
-    app.kubernetes.io/component: kubeflow-tools
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: deploykf-dependencies
     app.kubernetes.io/part-of: "deploykf"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,7 +14,11 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/kubeflow-tools/tensorboards/tensorboard-controller"
+    path: "argocd/apps/deploykf/manifests/deploykf-dependencies/cert-manager"
+    helm:
+      ignoreMissingValueFiles: true
+      valueFiles:
+        - values-overrides.yaml
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: kubeflow
+    namespace: "cert-manager"

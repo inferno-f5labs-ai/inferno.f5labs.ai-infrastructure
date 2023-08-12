@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kf-tools--notebooks--notebook-controller
+  name: kf-tools--training-operator
   namespace: "argocd"
   labels:
-    app.kubernetes.io/name: notebook-controller
+    app.kubernetes.io/name: training-operator
     app.kubernetes.io/component: kubeflow-tools
     app.kubernetes.io/part-of: "deploykf"
   finalizers:
@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: "https://github.com/inferno-f5labs-ai/inferno.f5labs.ai-infrastructure.git"
     targetRevision: "master"
-    path: "argocd/argocd-apps/deploykf/manifests/kubeflow-tools/notebooks/notebook-controller"
+    path: "argocd/apps/deploykf/manifests/kubeflow-tools/training-operator"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kubeflow
