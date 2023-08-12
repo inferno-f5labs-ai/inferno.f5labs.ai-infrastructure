@@ -333,7 +333,7 @@ deploykf_opt:
   ##            deploykf-minio
   ## --------------------------------------
   deploykf_minio:
-    enabled: true
+    enabled: false
     namespace: deploykf-minio
     ## root user configs for minio
     ##
@@ -385,7 +385,7 @@ deploykf_opt:
   ##            deploykf-mysql
   ## --------------------------------------
   deploykf_mysql:
-    enabled: true
+    enabled: false
     namespace: deploykf-mysql
     ## configs for the "root@localhost" mysql user
     ##  - these credentials are used by the liveness probes

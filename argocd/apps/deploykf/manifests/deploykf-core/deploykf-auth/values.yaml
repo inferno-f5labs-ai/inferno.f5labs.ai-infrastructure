@@ -104,7 +104,7 @@ dex:
     ## OpenID client for Minio Console
     ##
     minioConsole:
-      enabled: true
+      enabled: false
       namespace: "deploykf-minio"
       clientId: "minio-console"
       clientSecret:

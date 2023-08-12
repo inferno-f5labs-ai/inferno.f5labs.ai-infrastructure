@@ -27,10 +27,6 @@ resources:
   ##################
   ## deploykf-opt ##
   ##################
-  - deploykf-opt/deploykf-minio.yaml
-  - namespaces/deploykf-minio.yaml
-  - deploykf-opt/deploykf-mysql.yaml
-  - namespaces/deploykf-mysql.yaml
 
   ####################
   ## deploykf-tools ##

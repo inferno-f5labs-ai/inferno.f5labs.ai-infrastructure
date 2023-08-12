@@ -1,3 +1,4 @@
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -24,6 +25,7 @@ spec:
       kind: MutatingWebhookConfiguration
       jqPathExpressions:
         - ".webhooks[]?.clientConfig.caBundle"
+
     ## `rules` are aggregated when `aggregationRule.clusterRoleSelectors` is set
     - group: rbac.authorization.k8s.io
       kind: ClusterRole

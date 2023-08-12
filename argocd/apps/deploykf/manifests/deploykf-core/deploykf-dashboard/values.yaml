@@ -94,11 +94,6 @@ centralDashboard:
         text: Argo Server
         icon: settings-input-composite
         link: "https://argo-server.kf.f5labs.ai:8443"
-      - type: item
-        iframe: false
-        text: Minio Console
-        icon: cloud
-        link: "https://minio-console.kf.f5labs.ai:8443"
 
     ## quick action links that appear in the home page
     ##
